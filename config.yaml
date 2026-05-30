@@ -1,0 +1,12 @@
+# config.yaml — configuración SIN secretos (los secretos van en .env)
+trading_enabled: true        # interruptor on/off global del trading
+max_open_trades: 9           # máx. posiciones simultáneas (3 TP x 3 cuentas = 9)
+tolerance_pips: 20           # descarta si el precio se alejó más de esto de la señal
+
+accounts:
+  - name: DEMO1
+    # Carpeta buzón DENTRO de MQL4/Files del terminal (ver README)
+    mailbox_path: /ruta/al/terminal/MQL4/Files/bridge
+    lot: 0.01
+    symbol_suffix: ""        # ej. ".r" o "pro" si el broker usa sufijos
+    active: true
