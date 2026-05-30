@@ -12,8 +12,9 @@ def format_discarded(signal: Signal, reason: str) -> str:
 
 def format_executed(signal: Signal, results: list[OrderResult]) -> str:
     ok = [r for r in results if r.success]
+    header_emoji = "✅" if ok else "⚠️"
     lines = [
-        f"✅ {signal.symbol} {signal.direction.value} @ {signal.entry} "
+        f"{header_emoji} {signal.symbol} {signal.direction.value} @ {signal.entry} "
         f"| SL {signal.stop_loss}",
         f"Ejecutadas {len(ok)}/{len(results)}:",
     ]

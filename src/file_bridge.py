@@ -44,7 +44,16 @@ class FileBridge:
         deadline = time.monotonic() + self.timeout_s
         while time.monotonic() < deadline:
             if response_file.exists():
-                data = json.loads(response_file.read_text(encoding="utf-8"))
+                try:
+                    data = json.loads(response_file.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    response_file.unlink(missing_ok=True)
+                    return OrderResult(
+                        success=False,
+                        error="Respuesta del EA ilegible",
+                        account=req.account,
+                        comment=req.comment,
+                    )
                 response_file.unlink(missing_ok=True)
                 return OrderResult(
                     success=bool(data.get("success")),

@@ -7,6 +7,8 @@ from src.models import Direction, Signal
 _NUM = r"(\d+(?:\.\d+)?)"
 _DIRECTION_RE = re.compile(rf"\b(BUY|SELL)\b\D*?{_NUM}", re.IGNORECASE)
 _SL_RE = re.compile(rf"SL\b\D*?{_NUM}", re.IGNORECASE)
+# Asume el formato emoji-tecla del canal (ej. "TP: 1️⃣ 214.70"); omite el ordinal
+# con keycap (dígito seguido de ️⃣) para capturar el precio real.
 _TP_RE = re.compile(r"TP\b(?:[^\d]|\d[️⃣])+(\d+(?:\.\d+)?)", re.IGNORECASE)
 _SYMBOL_RE = re.compile(r"^[A-Z0-9]{3,8}$")
 

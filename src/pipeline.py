@@ -4,6 +4,7 @@ from typing import Callable
 
 from src.config import Config
 from src.file_bridge import FileBridge
+from src.models import OrderResult
 from src.notifier import format_discarded, format_executed
 from src.order_router import build_orders
 from src.risk_guard import evaluate
@@ -40,7 +41,15 @@ def process_message(
 
     results = []
     for order in orders:
-        bridge = bridges[order.account]
+        bridge = bridges.get(order.account)
+        if bridge is None:
+            results.append(OrderResult(
+                success=False,
+                error=f"Sin puente configurado para la cuenta {order.account}",
+                account=order.account,
+                comment=order.comment,
+            ))
+            continue
         results.append(bridge.send(order))
 
     notify(format_executed(signal, results))

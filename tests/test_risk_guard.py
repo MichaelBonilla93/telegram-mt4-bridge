@@ -40,3 +40,9 @@ def test_accepts_valid_buy():
 def test_accepts_valid_sell():
     ok, _ = evaluate(SELL, trading_enabled=True, max_open_trades=9, current_open=0)
     assert ok is True
+
+
+def test_rejects_buy_with_tp_at_entry():
+    bad = Signal("GBPJPY", Direction.BUY, 214.50, 213.85, [214.50, 215.00, 215.50])
+    ok, reason = evaluate(bad, trading_enabled=True, max_open_trades=9, current_open=0)
+    assert ok is False

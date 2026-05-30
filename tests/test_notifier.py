@@ -24,3 +24,12 @@ def test_format_executed_lists_tickets_and_failures():
     assert "TP3" in msg
     assert "price moved" in msg
     assert "2/3" in msg  # 2 de 3 exitosas
+
+
+def test_format_executed_uses_warning_when_all_fail():
+    results = [
+        OrderResult(success=False, error="x", account="DEMO1", comment="TG TP1"),
+    ]
+    msg = format_executed(BUY, results)
+    assert msg.startswith("⚠️")
+    assert "0/1" in msg
