@@ -9,3 +9,5 @@ state/
 .pytest_cache/
 .DS_Store
 *.egg-info/
+bridge.log
+*.log

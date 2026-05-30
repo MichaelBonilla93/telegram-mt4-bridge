@@ -30,7 +30,8 @@ def _load_dotenv(path: str = ".env") -> None:
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
                 key, _, value = line.partition("=")
-                os.environ.setdefault(key.strip(), value.strip())
+                value = value.strip().strip('"').strip("'")
+                os.environ.setdefault(key.strip(), value)
 
 
 async def amain() -> None:
@@ -53,6 +54,7 @@ async def amain() -> None:
         seen.mark(mid)
         notes: list[str] = []
         # process_message bloquea (polling de archivos) -> a un hilo
+        # TODO(MVP): current_open=0 fijo; aún no consulta posiciones reales en MT4.
         outcome = await asyncio.to_thread(
             process_message, text,
             message_id=mid, config=config, bridges=bridges,
