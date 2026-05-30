@@ -1,0 +1,17 @@
+[project]
+name = "telegram-mt4-bridge"
+version = "0.1.0"
+description = "Puente de señales de Telegram a MetaTrader 4"
+requires-python = ">=3.11"
+dependencies = [
+    "telethon>=1.36",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+testpaths = ["tests"]
