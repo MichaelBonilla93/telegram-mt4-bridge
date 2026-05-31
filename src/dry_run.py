@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from src.config import Config, load_config, load_secrets
 from src.main import _load_dotenv
@@ -84,6 +85,7 @@ async def run(limit: int = 50) -> dict:
     config = load_config()
     secrets = load_secrets()
 
+    Path("state").mkdir(parents=True, exist_ok=True)  # Telethon guarda aquí la sesión
     client = TelegramClient("state/session", secrets.api_id, secrets.api_hash)
     await client.start(phone=secrets.phone)
     print(f"Conectado. Trayendo últimos {limit} mensajes de: {secrets.channel}\n")
