@@ -77,6 +77,29 @@ def format_line(*, message_id: int, text: str, result: DryRunResult) -> str:
     return f"[#{message_id}] ·  ignored — {preview}"
 
 
+async def resolve_channel(client, channel: str):
+    """Resuelve el canal por id numérico, @username o título (buscando en diálogos)."""
+    channel = channel.strip()
+    # id numérico (ej. -1001234567890)
+    try:
+        return await client.get_entity(int(channel))
+    except (ValueError, TypeError):
+        pass
+    # @username
+    if channel.startswith("@"):
+        return await client.get_entity(channel)
+    # por título: buscar en la lista de diálogos (case-insensitive)
+    target = channel.casefold()
+    async for dialog in client.iter_dialogs():
+        if (dialog.name or "").strip().casefold() == target:
+            return dialog.entity
+    raise ValueError(
+        f'No encontré un canal/chat llamado "{channel}". Revisa TG_CHANNEL en .env: '
+        "usa el @username o el id numérico, o el título EXACTO. "
+        "Puedes listar tus chats con el snippet del README (sección 2)."
+    )
+
+
 async def run(limit: int = 50) -> dict:
     """Trae los últimos `limit` mensajes del canal y los analiza. Devuelve conteos."""
     from telethon import TelegramClient
@@ -88,9 +111,11 @@ async def run(limit: int = 50) -> dict:
     Path("state").mkdir(parents=True, exist_ok=True)  # Telethon guarda aquí la sesión
     client = TelegramClient("state/session", secrets.api_id, secrets.api_hash)
     await client.start(phone=secrets.phone)
+
+    entity = await resolve_channel(client, secrets.channel)
     print(f"Conectado. Trayendo últimos {limit} mensajes de: {secrets.channel}\n")
 
-    messages = await client.get_messages(secrets.channel, limit=limit)
+    messages = await client.get_messages(entity, limit=limit)
     counts = {"ignored": 0, "discarded": 0, "executed": 0}
 
     for msg in reversed(list(messages)):  # del más viejo al más nuevo
