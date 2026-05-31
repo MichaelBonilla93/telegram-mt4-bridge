@@ -9,6 +9,9 @@ import asyncio
 import os
 import sys
 
+# Permite ejecutar el script directamente (añade la raíz del proyecto al path).
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from telethon import TelegramClient
 
 from src.dry_run import resolve_channel
