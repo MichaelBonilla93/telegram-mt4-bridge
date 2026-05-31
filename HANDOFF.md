@@ -5,10 +5,11 @@
 
 ## TL;DR
 
-MVP **completo, testeado e integrado en `master`** (34 tests verdes). Falta:
-1. **Push a GitHub** (bloqueado por autenticación — ver abajo).
-2. **Modo dry-run** de solo lectura (diseñado, NO implementado).
-3. **Prueba end-to-end en cuenta demo** (requiere intervención del usuario).
+MVP **completo, testeado e integrado en `master`** (40 tests verdes). Estado:
+1. ✅ **Push a GitHub** hecho (SSH personal, `origin` sincronizado).
+2. ✅ **Modo dry-run** de solo lectura implementado (`src/dry_run.py`,
+   `python -m src.dry_run [N]`). En rama `feature/dry-run` (pendiente merge a master).
+3. ⏳ **Prueba end-to-end en cuenta demo** (requiere intervención del usuario).
 
 ---
 
@@ -117,26 +118,22 @@ Tras el push exitoso: `git push -u origin master` deja el upstream configurado.
 
 ---
 
-## PASO PENDIENTE 2 — Modo dry-run de solo lectura (NO implementado)
+## PASO 2 — Modo dry-run de solo lectura (✅ IMPLEMENTADO)
 
-**Objetivo:** validar el parser contra mensajes REALES del canal y la conexión
-Telethon, SIN abrir trades y SIN necesitar MT4. Es el siguiente paso de mayor valor.
+Hecho en `src/dry_run.py` (+ `tests/test_dry_run.py`, 6 tests). En rama
+`feature/dry-run`. Reusa `process_message` con un `DryRunBridge` simulado que
+registra órdenes y devuelve éxito ficticio (no toca MT4). Función pura testeable
+`analyze(text, *, message_id, config) -> DryRunResult(outcome, orders, notes)`.
 
-**Diseño sugerido:**
-- Nuevo entrypoint, p.ej. `src/dry_run.py` (o flag `--dry-run` en main).
-- Conecta Telethon con las mismas credenciales (`.env`), usa
-  `client.get_messages(channel, limit=N)` para traer los últimos N mensajes.
-- Pasa cada texto por `parse_signal()`. Imprime: por cada mensaje, si es señal
-  (símbolo/dir/entry/SL/TPs) o por qué se ignoró. NO llama a file_bridge.
-- Idealmente reusar `process_message` con bridges "no-op" (un FakeBridge que solo
-  registra) y `trading_enabled` efectivo en modo simulación, para ejercitar también
-  risk_guard. Alternativa simple: solo parser.
-- Seguir TDD donde aplique (el parser ya está cubierto; el dry-run en sí es I/O).
+Uso: `python -m src.dry_run [N]` (N=50 por defecto). Trae los últimos N mensajes y
+muestra qué señales detecta / descarta / ignora y qué órdenes simularía.
 
-**Riesgo a cubrir:** canales reales mandan promos, mensajes fijados, señales
-editadas y otros símbolos (XAUUSD, US30...). Verificar que el parser los maneja
-(ignora basura, parsea variantes). Si aparecen formatos nuevos, ampliar tests del
-parser con esos ejemplos reales.
+**Pendiente del usuario:** correrlo contra el canal real para validar el parser.
+Canales reales mandan promos, fijados, señales editadas y otros símbolos (XAUUSD,
+US30...). Si aparece un formato nuevo que no parsea, ampliar `signal_parser.py` y
+sus tests con esos ejemplos reales.
+
+**Pendiente git:** mergear `feature/dry-run` a `master` y push.
 
 ---
 
