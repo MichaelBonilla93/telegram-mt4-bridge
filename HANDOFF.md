@@ -128,12 +128,18 @@ registra órdenes y devuelve éxito ficticio (no toca MT4). Función pura testea
 Uso: `python -m src.dry_run [N]` (N=50 por defecto). Trae los últimos N mensajes y
 muestra qué señales detecta / descarta / ignora y qué órdenes simularía.
 
-**Pendiente del usuario:** correrlo contra el canal real para validar el parser.
-Canales reales mandan promos, fijados, señales editadas y otros símbolos (XAUUSD,
-US30...). Si aparece un formato nuevo que no parsea, ampliar `signal_parser.py` y
-sus tests con esos ejemplos reales.
+**VALIDADO (2026-05-31):** corrido contra 200 mensajes reales → 114 señales
+detectadas (símbolos: GBPJPY, XAUUSD, EURJPY, CHFJPY, NZDJPY, USDJPY, CADJPY),
+83 ignoradas correctamente (saludos, "X PIPS", cierres manuales), 3 descartadas.
+El parser generaliza bien más allá del ejemplo original.
 
-**Pendiente git:** mergear `feature/dry-run` a `master` y push.
+Las 3 descartadas eran **errores de tipeo del canal**: texto "BUY" pero emoji 🔴 +
+TPs descendentes + SL por encima de la entrada = un SELL mal etiquetado. El
+`risk_guard` las descartó por incoherencia (comportamiento correcto). **Decisión
+del usuario: seguir descartándolas** (no auto-corregir dirección). Caso real
+blindado en `tests/test_real_signals.py`.
+
+**Pendiente git:** mergeado a master y pusheado.
 
 ---
 
