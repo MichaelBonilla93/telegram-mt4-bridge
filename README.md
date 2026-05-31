@@ -116,6 +116,27 @@ Usa el id (ej. `-1001234567890`) o el nombre en `TG_CHANNEL`.
 
 ---
 
+## 2.5. Dry-run: validar el parser con mensajes reales (recomendado antes de MT4)
+
+Antes de instalar nada en MT4, corre el **modo dry-run de solo lectura**. Trae los
+últimos N mensajes del canal, los pasa por el pipeline completo (parser + guardas +
+ruteo) con un **bridge simulado** y muestra **qué órdenes se enviarían**, sin abrir
+ningún trade y sin necesitar MT4.
+
+```bash
+.venv/bin/python -m src.dry_run 50      # analiza los últimos 50 mensajes
+```
+
+Verás, por cada mensaje, si se detecta como señal (✅ EXECUTED con las órdenes que
+se simularían), si se descarta (⚠️ con el motivo) o si se ignora. Úsalo para
+confirmar que el parser entiende bien las señales reales del canal. Si aparece un
+formato nuevo que no parsea, hay que ampliar el parser y sus tests.
+
+> La tolerancia de pips NO se evalúa en dry-run (en producción la valida el EA con
+> el precio en vivo). El dry-run valida parseo, guardas de riesgo y ruteo.
+
+---
+
 ## 3. Instalar el Expert Advisor en MT4
 
 Por **cada** terminal MT4 (uno por cuenta):
